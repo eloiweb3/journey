@@ -69,8 +69,34 @@ export function useJourneyProgramAccount({ account }: { account: PublicKey }) {
     onError: () => toast.error('Failed to create entry'),
   });
 
+  const updateEntry = useMutation<string, Error, CreateEntryArgs>({
+    mutationKey: ['journey-entry', 'update-entry', { cluster }],
+    mutationFn: async ({ title, message, owner }) => {
+      return program.methods.updateJourneyEntry(title, message).rpc();
+    },
+    onSuccess: (signature) => {
+      transactionToast(signature);
+      return accounts.refetch();
+    },
+    onError: () => toast.error('Failed to update entry'),
+  });
+
+  const deleteEntry = useMutation<string, Error, CreateEntryArgs>({
+    mutationKey: ['journey-entry', 'delete-entry', { cluster }],
+    mutationFn: async ({ title, message, owner }) => {
+      return program.methods.deleteJourneyEntry(title).rpc();
+    },
+    onSuccess: (signature) => {
+      transactionToast(signature);
+      return accounts.refetch();
+    },
+    onError: () => toast.error('Failed to delete entry'),
+  });
+
   return {
     accountQuery,
     createEntry,
+    updateEntry,
+    deleteEntry,
   };
 }
