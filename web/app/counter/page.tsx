@@ -1,5 +1,5 @@
-import CounterFeature from '@/components/counter/counter-feature';
+import journeyFeature from '@/components/journey/journey-feature';
 
 export default function Page() {
-  return <CounterFeature />;
+  return <journeyFeature />;
 }

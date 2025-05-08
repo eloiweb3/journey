@@ -1,6 +1,6 @@
 'use client';
 
-import { getCounterProgram, getCounterProgramId } from '@journey/anchor';
+import { getjourneyProgram, getjourneyProgramId } from '@journey/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { Cluster, Keypair, PublicKey } from '@solana/web3.js';
@@ -11,20 +11,20 @@ import { useCluster } from '../cluster/cluster-data-access';
 import { useAnchorProvider } from '../solana/solana-provider';
 import { useTransactionToast } from '../ui/ui-layout';
 
-export function useCounterProgram() {
+export function usejourneyProgram() {
   const { connection } = useConnection();
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const provider = useAnchorProvider();
   const programId = useMemo(
-    () => getCounterProgramId(cluster.network as Cluster),
+    () => getjourneyProgramId(cluster.network as Cluster),
     [cluster]
   );
-  const program = getCounterProgram(provider);
+  const program = getjourneyProgram(provider);
 
   const accounts = useQuery({
-    queryKey: ['counter', 'all', { cluster }],
-    queryFn: () => program.account.counter.all(),
+    queryKey: ['journey', 'all', { cluster }],
+    queryFn: () => program.account.journey.all(),
   });
 
   const getProgramAccount = useQuery({
@@ -33,11 +33,11 @@ export function useCounterProgram() {
   });
 
   const initialize = useMutation({
-    mutationKey: ['counter', 'initialize', { cluster }],
+    mutationKey: ['journey', 'initialize', { cluster }],
     mutationFn: (keypair: Keypair) =>
       program.methods
         .initialize()
-        .accounts({ counter: keypair.publicKey })
+        .accounts({ journey: keypair.publicKey })
         .signers([keypair])
         .rpc(),
     onSuccess: (signature) => {
@@ -56,20 +56,20 @@ export function useCounterProgram() {
   };
 }
 
-export function useCounterProgramAccount({ account }: { account: PublicKey }) {
+export function usejourneyProgramAccount({ account }: { account: PublicKey }) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program, accounts } = useCounterProgram();
+  const { program, accounts } = usejourneyProgram();
 
   const accountQuery = useQuery({
-    queryKey: ['counter', 'fetch', { cluster, account }],
-    queryFn: () => program.account.counter.fetch(account),
+    queryKey: ['journey', 'fetch', { cluster, account }],
+    queryFn: () => program.account.journey.fetch(account),
   });
 
   const closeMutation = useMutation({
-    mutationKey: ['counter', 'close', { cluster, account }],
+    mutationKey: ['journey', 'close', { cluster, account }],
     mutationFn: () =>
-      program.methods.close().accounts({ counter: account }).rpc(),
+      program.methods.close().accounts({ journey: account }).rpc(),
     onSuccess: (tx) => {
       transactionToast(tx);
       return accounts.refetch();
@@ -77,9 +77,9 @@ export function useCounterProgramAccount({ account }: { account: PublicKey }) {
   });
 
   const decrementMutation = useMutation({
-    mutationKey: ['counter', 'decrement', { cluster, account }],
+    mutationKey: ['journey', 'decrement', { cluster, account }],
     mutationFn: () =>
-      program.methods.decrement().accounts({ counter: account }).rpc(),
+      program.methods.decrement().accounts({ journey: account }).rpc(),
     onSuccess: (tx) => {
       transactionToast(tx);
       return accountQuery.refetch();
@@ -87,9 +87,9 @@ export function useCounterProgramAccount({ account }: { account: PublicKey }) {
   });
 
   const incrementMutation = useMutation({
-    mutationKey: ['counter', 'increment', { cluster, account }],
+    mutationKey: ['journey', 'increment', { cluster, account }],
     mutationFn: () =>
-      program.methods.increment().accounts({ counter: account }).rpc(),
+      program.methods.increment().accounts({ journey: account }).rpc(),
     onSuccess: (tx) => {
       transactionToast(tx);
       return accountQuery.refetch();
@@ -97,9 +97,9 @@ export function useCounterProgramAccount({ account }: { account: PublicKey }) {
   });
 
   const setMutation = useMutation({
-    mutationKey: ['counter', 'set', { cluster, account }],
+    mutationKey: ['journey', 'set', { cluster, account }],
     mutationFn: (value: number) =>
-      program.methods.set(value).accounts({ counter: account }).rpc(),
+      program.methods.set(value).accounts({ journey: account }).rpc(),
     onSuccess: (tx) => {
       transactionToast(tx);
       return accountQuery.refetch();
