@@ -30,6 +30,9 @@ pub mod journey {
         Ok(())
     }
 
+    pub fn delete_journey_entry(_ctx: Context<DeleteJourneyEntry>, _title: String) -> Result<()> {
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
@@ -62,13 +65,27 @@ pub struct UpdateJourneyEntry<'info> {
     pub owner: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
+#[derive(Accounts)]
+#[instruction(title: String)]
+pub struct DeleteJourneyEntry<'info> {
+    #[account(
+      mut,
+      seeds = [title.as_bytes(), owner.key().as_ref()],
+      bump,
+      close = owner,
+  )]
+    pub journey_entry: Account<'info, JourneyEntryState>,
+    #[account(mut)]
+    pub owner: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
 
 #[account]
 #[derive(InitSpace)]
 pub struct JourneyEntryState {
-  pub owner: Pubkey,
-  #[max_len(50)]
-  pub title: String,
-  #[max_len(1000)]
-  pub message: String,
+    pub owner: Pubkey,
+    #[max_len(50)]
+    pub title: String,
+    #[max_len(1000)]
+    pub message: String,
 }
