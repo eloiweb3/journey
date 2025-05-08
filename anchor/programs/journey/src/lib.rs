@@ -2,7 +2,7 @@
 
 use anchor_lang::prelude::*;
 
-declare_id!("GiT5e2Vg9yTqiozmxjJG86ZLaejUstRTKbkDSz6JSLDk");
+declare_id!("6zWkuhQsb7AYBjt9zHSQdmgyBFMoPhmHqBaCXvMBuFvM");
 
 #[program]
 pub mod journey {

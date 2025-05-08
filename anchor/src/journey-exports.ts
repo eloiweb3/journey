@@ -2,25 +2,25 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { Cluster, PublicKey } from '@solana/web3.js';
 import journeyIDL from '../target/idl/journey.json';
-import type { journey } from '../target/types/journey';
+import type { Journey } from '../target/types/journey';
 
 // Re-export the generated IDL and type
-export { journey, journeyIDL };
+export { Journey, journeyIDL };
 
 // The programId is imported from the program IDL.
 export const journey_PROGRAM_ID = new PublicKey(journeyIDL.address);
 
-// This is a helper function to get the journey Anchor program.
-export function getjourneyProgram(provider: AnchorProvider) {
-  return new Program(journeyIDL as journey, provider);
+// This is a helper function to get the Journey Anchor program.
+export function getJourneyProgram(provider: AnchorProvider) {
+  return new Program(journeyIDL as Journey, provider);
 }
 
-// This is a helper function to get the program ID for the journey program depending on the cluster.
-export function getjourneyProgramId(cluster: Cluster) {
+// This is a helper function to get the program ID for the Journey program depending on the cluster.
+export function getJourneyProgramId(cluster: Cluster) {
   switch (cluster) {
     case 'devnet':
     case 'testnet':
-      // This is the program ID for the journey program on devnet and testnet.
+      // This is the program ID for the Journey program on devnet and testnet.
       return new PublicKey('CounNZdmsQmWh7uVngV9FXW2dZ6zAgbJyYsvBpqbykg');
     case 'mainnet-beta':
     default:

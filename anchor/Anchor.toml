@@ -1,11 +1,11 @@
 [toolchain]
 
 [features]
-seeds = false
+resolution = true
 skip-lint = false
 
 [programs.localnet]
-journey = "GiT5e2Vg9yTqiozmxjJG86ZLaejUstRTKbkDSz6JSLDk"
+journey = "6zWkuhQsb7AYBjt9zHSQdmgyBFMoPhmHqBaCXvMBuFvM"
 
 [registry]
 url = "https://api.apr.dev"

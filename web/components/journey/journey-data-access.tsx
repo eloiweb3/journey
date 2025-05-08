@@ -1,6 +1,6 @@
 'use client';
 
-import { getjourneyProgram, getjourneyProgramId } from '@journey/anchor';
+import { getJourneyProgram, getJourneyProgramId } from '@journey/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { Cluster, Keypair, PublicKey } from '@solana/web3.js';
@@ -11,40 +11,31 @@ import { useCluster } from '../cluster/cluster-data-access';
 import { useAnchorProvider } from '../solana/solana-provider';
 import { useTransactionToast } from '../ui/ui-layout';
 
-export function usejourneyProgram() {
+interface CreateEntryArgs {
+  title: string;
+  message: string;
+  owner: PublicKey;
+}
+
+export function useJourneyProgram() {
   const { connection } = useConnection();
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const provider = useAnchorProvider();
   const programId = useMemo(
-    () => getjourneyProgramId(cluster.network as Cluster),
+    () => getJourneyProgramId(cluster.network as Cluster),
     [cluster]
   );
-  const program = getjourneyProgram(provider);
+  const program = getJourneyProgram(provider);
 
   const accounts = useQuery({
     queryKey: ['journey', 'all', { cluster }],
-    queryFn: () => program.account.journey.all(),
+    queryFn: () => program.account.journeyEntryState.all(),
   });
 
   const getProgramAccount = useQuery({
     queryKey: ['get-program-account', { cluster }],
     queryFn: () => connection.getParsedAccountInfo(programId),
-  });
-
-  const initialize = useMutation({
-    mutationKey: ['journey', 'initialize', { cluster }],
-    mutationFn: (keypair: Keypair) =>
-      program.methods
-        .initialize()
-        .accounts({ journey: keypair.publicKey })
-        .signers([keypair])
-        .rpc(),
-    onSuccess: (signature) => {
-      transactionToast(signature);
-      return accounts.refetch();
-    },
-    onError: () => toast.error('Failed to initialize account'),
   });
 
   return {
@@ -56,61 +47,30 @@ export function usejourneyProgram() {
   };
 }
 
-export function usejourneyProgramAccount({ account }: { account: PublicKey }) {
+export function useJourneyProgramAccount({ account }: { account: PublicKey }) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program, accounts } = usejourneyProgram();
+  const { program, accounts } = useJourneyProgram();
 
   const accountQuery = useQuery({
     queryKey: ['journey', 'fetch', { cluster, account }],
-    queryFn: () => program.account.journey.fetch(account),
+    queryFn: () => program.account.journeyEntryState.fetch(account),
   });
 
-  const closeMutation = useMutation({
-    mutationKey: ['journey', 'close', { cluster, account }],
-    mutationFn: () =>
-      program.methods.close().accounts({ journey: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx);
+  const createEntry = useMutation<string, Error, CreateEntryArgs>({
+    mutationKey: ['journey-entry', 'create-entry', { cluster }],
+    mutationFn: async ({ title, message, owner }) => {
+      return program.methods.createJourneyEntry(title, message).rpc();
+    },
+    onSuccess: (signature) => {
+      transactionToast(signature);
       return accounts.refetch();
     },
-  });
-
-  const decrementMutation = useMutation({
-    mutationKey: ['journey', 'decrement', { cluster, account }],
-    mutationFn: () =>
-      program.methods.decrement().accounts({ journey: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx);
-      return accountQuery.refetch();
-    },
-  });
-
-  const incrementMutation = useMutation({
-    mutationKey: ['journey', 'increment', { cluster, account }],
-    mutationFn: () =>
-      program.methods.increment().accounts({ journey: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx);
-      return accountQuery.refetch();
-    },
-  });
-
-  const setMutation = useMutation({
-    mutationKey: ['journey', 'set', { cluster, account }],
-    mutationFn: (value: number) =>
-      program.methods.set(value).accounts({ journey: account }).rpc(),
-    onSuccess: (tx) => {
-      transactionToast(tx);
-      return accountQuery.refetch();
-    },
+    onError: () => toast.error('Failed to create entry'),
   });
 
   return {
     accountQuery,
-    closeMutation,
-    decrementMutation,
-    incrementMutation,
-    setMutation,
+    createEntry,
   };
 }
