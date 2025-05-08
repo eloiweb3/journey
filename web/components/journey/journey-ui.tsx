@@ -1,30 +1,66 @@
 'use client';
 
 import { Keypair, PublicKey } from '@solana/web3.js';
-import { useMemo } from 'react';
 import { ellipsify } from '../ui/ui-layout';
 import { ExplorerLink } from '../cluster/cluster-ui';
 import {
-  usejourneyProgram,
-  usejourneyProgramAccount,
+  useJourneyProgram,
+  useJourneyProgramAccount,
 } from './journey-data-access';
+import { useState } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
 
-export function journeyCreate() {
-  const { initialize } = usejourneyProgram();
+export function JourneyCreate() {
+  // const { initialize } = useJourneyProgram();
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
+  const { createEntry } = useJourneyProgramAccount();
+  const { publicKey } = useWallet();
+
+  const isFormValid = title?.trim() !== '' && message?.trim() !== '';
+
+  const handleSubmit = () => {
+    if (!isFormValid) {
+      return;
+    }
+    createEntry.mutateAsync({
+      title,
+      message,
+      owner: publicKey as PublicKey,
+    });
+  };
+
+  if (!publicKey) {
+    return (
+      <div className="alert alert-info flex justify-center">
+        <span>Please connect your wallet to create a new account.</span>
+      </div>
+    );
+  }
 
   return (
-    <button
-      className="btn btn-xs lg:btn-md btn-primary"
-      onClick={() => initialize.mutateAsync(Keypair.generate())}
-      disabled={initialize.isPending}
-    >
-      Create {initialize.isPending && '...'}
-    </button>
+    <div>
+      <input
+        type="text"
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="input input-bordered w-full max-w-xs"
+      />
+      <textarea name="message" id="message" placeholder="message"></textarea>
+      <button
+        onClick={handleSubmit}
+        disabled={createEntry.isPending || !isFormValid}
+        className="btn btn-primary"
+      >
+        CREATE ENTRY
+      </button>
+    </div>
   );
 }
 
 export function journeyList() {
-  const { accounts, getProgramAccount } = usejourneyProgram();
+  const { accounts, getProgramAccount } = useJourneyProgram();
 
   if (getProgramAccount.isLoading) {
     return <span className="loading loading-spinner loading-lg"></span>;
@@ -69,7 +105,7 @@ function journeyCard({ account }: { account: PublicKey }) {
     setMutation,
     decrementMutation,
     closeMutation,
-  } = usejourneyProgramAccount({ account });
+  } = useJourneyProgramAccount({ account });
 
   const count = useMemo(
     () => accountQuery.data?.count ?? 0,

@@ -43,7 +43,6 @@ export function useJourneyProgram() {
     programId,
     accounts,
     getProgramAccount,
-    initialize,
   };
 }
 
