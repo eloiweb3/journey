@@ -21,7 +21,7 @@ export function getJourneyProgramId(cluster: Cluster) {
     case 'devnet':
     case 'testnet':
       // This is the program ID for the Journey program on devnet and testnet.
-      return new PublicKey('CounNZdmsQmWh7uVngV9FXW2dZ6zAgbJyYsvBpqbykg');
+      return new PublicKey('6zWkuhQsb7AYBjt9zHSQdmgyBFMoPhmHqBaCXvMBuFvM');
     case 'mainnet-beta':
     default:
       return journey_PROGRAM_ID;

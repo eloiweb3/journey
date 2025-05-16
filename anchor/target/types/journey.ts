@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/journey.json`.
  */
 export type Journey = {
-  "address": "GiT5e2Vg9yTqiozmxjJG86ZLaejUstRTKbkDSz6JSLDk",
+  "address": "6zWkuhQsb7AYBjt9zHSQdmgyBFMoPhmHqBaCXvMBuFvM",
   "metadata": {
     "name": "journey",
     "version": "0.1.0",
