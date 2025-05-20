@@ -1,96 +1,69 @@
-# journey
+## Description
 
-This project is generated with the [create-solana-dapp](https://github.com/solana-developers/create-solana-dapp) generator.
+  _Journey_ is a Solana blockchain application that enables users to create, update, and delete personal journal entries. Each entry consists of a title and message, with entries stored securely on the Solana   blockchain. This document provides a high-level overview of the Journey program architecture, core components, and their interactions.
 
-## Getting Started
 
-### Prerequisites
+### System architecture
 
-- Node v18.18.0 or higher
+  The App follows a layered architecture pattern that separates concerns across multiple components:
 
-- Rust v1.77.2 or higher
-- Anchor CLI 0.30.0 or higher
-- Solana CLI 1.18.9 or higher
+<img width="319" alt="image" src="https://github.com/user-attachments/assets/7d20daf3-0511-416c-a199-a7b83e757675" />
 
-### Installation
+# Core components
 
-#### Clone the repo
+### Solana Program
+  Journey Solana program is implemented in Rust using the Anchor framework. It serves as the backend for the application, handling all data storage and transaction logic.
 
-```shell
-git clone <repo-url>
-cd <repo-name>
-```
+  The program provides three main instructions:
 
-#### Install Dependencies
+  <img width="700" alt="image" src="https://github.com/user-attachments/assets/dba82396-b4ee-4480-8f1b-8f03805fe558" />
 
-```shell
-npm install
-```
+  <br>
 
-#### Start the web app
+Each entry is stored in a JourneyEntryState account, which contains:
 
-```
-npm run dev
-```
+  - Owner (the user's public key)
+  - Title (limited to 50 characters)
+  - Message (limited to 1000 characters)
 
-## Apps
 
-### anchor
+### Account structure
 
-This is a Solana program written in Rust using the Anchor framework.
+The program uses Program Derived Addresses (PDAs) to deterministically generate account addresses based on the title and owner. This ensures:
 
-#### Commands
+  1. Each user can only have one entry with a given title
+  2. Entries can be easily located given the title and owner
 
-You can use any normal anchor commands. Either move to the `anchor` directory and run the `anchor` command or prefix the command with `npm run`, eg: `npm run anchor`.
+<img width="365" alt="image" src="https://github.com/user-attachments/assets/778c9d36-9ee7-40ef-8266-1bf758661800" />
 
-#### Sync the program id:
+### Data flow
 
-Running this command will create a new keypair in the `anchor/target/deploy` directory and save the address to the Anchor config file and update the `declare_id!` macro in the `./src/lib.rs` file of the program.
+The following sequence diagram illustrates the flow of data when creating a new journey entry:
 
-You will manually need to update the constant in `anchor/lib/journey-exports.ts` to match the new program id.
+<img width="1455" alt="image" src="https://github.com/user-attachments/assets/91f2a732-f614-423b-bdbd-d566df6e8525" />
 
-```shell
-npm run anchor keys sync
-```
+### UI Components
 
-#### Build the program:
+The Journey application provides several UI components for interaction:
 
-```shell
-npm run anchor-build
-```
+<img width="694" alt="image" src="https://github.com/user-attachments/assets/3ce8bfbd-f532-4e2e-980a-b4a0da0b2512" />
 
-#### Start the test validator with the program deployed:
+The UI components interact with the Solana program through custom React hooks that handle data fetching and mutation.
 
-```shell
-npm run anchor-localnet
-```
+<img width="743" alt="image" src="https://github.com/user-attachments/assets/25d95fb6-1520-4d2e-a37a-34b6b3d0d417" />
 
-#### Run the tests
+### Technical Implementation
+  The Journey program uses several key technologies:
 
-```shell
-npm run anchor-test
-```
+  Solana Blockchain: For secure, decentralized storage of journal entries
+  Anchor Framework: Simplifies Solana program development
+  React: For building the user interface
+  Next.js: For the web application framework
+  Key technical aspects include:
 
-#### Deploy to Devnet
+  Program ID: The Solana program has a unique identifier specified in declare_id!
+  Account Space Management: The program pre-allocates space for each entry account
+  Owner Verification: Only the owner of an entry can update or delete it
+  PDA Derivation: Accounts are derived using the entry title and owner public key
 
-```shell
-npm run anchor deploy --provider.cluster devnet
-```
 
-### web
-
-This is a React app that uses the Anchor generated client to interact with the Solana program.
-
-#### Commands
-
-Start the web app
-
-```shell
-npm run dev
-```
-
-Build the web app
-
-```shell
-npm run build
-```
